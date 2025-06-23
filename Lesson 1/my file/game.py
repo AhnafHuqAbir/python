@@ -88,7 +88,7 @@ def game_over(score):
         print(f"{RED}Better luck next time!{RESET}")
 
 def play_game():
-    lives = 3
+    lives = 4
     score = 0
     asked = 0
 

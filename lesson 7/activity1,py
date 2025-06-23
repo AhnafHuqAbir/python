@@ -1,0 +1,10 @@
+medical_cause = input("enter y for yes n for no : ")
+attendence = int(input("enter your attendence : "))
+
+if medical_cause.lower() == "y":
+    print("you are allowled")
+else:
+    if attendence > 75:
+        print("you are allowed")
+    else:
+        print("You are not allowed !!!")
