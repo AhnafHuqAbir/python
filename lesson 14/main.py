@@ -20,4 +20,8 @@ print(f"Bill Amount  : {bill_amount} Taka")
 if due > 0:
     print(f"Due Amount   : {due} Taka (to be paid later)")
 else:
-    print("No Due Amount.")
+    print("Deu Amount  : 0 Taka (No due)")
+
+
+
+# https://gifft.me/o/hw/9ve7n88s68elg3al4b1ds32l
