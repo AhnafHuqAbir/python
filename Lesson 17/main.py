@@ -17,5 +17,7 @@ elif choice == 'c':
     tan_value = int(input('Enter a number for tan: '))
     result = math.tan(tan_value)
     print(f'The tangent of {tan_value} is {result}')
+elif ValueError:
+    print("Error: Please enter a valid number for the trigonometric function.")
 else:
     print("Invalid choice. Please choose a, b, or c.")
