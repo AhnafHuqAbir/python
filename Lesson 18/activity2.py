@@ -1,15 +1,19 @@
 import random
 import time
 
-def randomGanaretor(starttime, endtime):
-    print(f"Generating random deat between {starttime} and {endtime}")
-    rendomGenerator = random.random()
-    deatFormet = '%m/%d/%y'
+def getRandomDate(startDate, endDate):
+    print("Printing random date between", startDate, "and", endDate)
+    randomGenerator = random.random()
+    deatFormat = '%m/%d/%Y'
 
-    starttime = time.mktime(time.strptime(starttime, deatFormet))
-    endtime = time.mktime(time.strptime(endtime, deatFormet))
+    startTime = time.mktime(time.strptime(startDate, deatFormat))
 
-    random_time = starttime + randomGanaretor * (endtime - starttime)
+    endtime = time.mktime(time.strptime(endDate,deatFormat))
 
-    random_date = time.strftime(deatFormet, time.localtime(random_time))
-print(f'Random_date: {randomGanaretor("01/01/2020", "12/31/2020")}')
+    randomTime = startTime + randomGenerator *(endtime - startTime)
+
+    randomDate = time.strftime(deatFormat, time.localtime(randomTime))
+
+    return randomDate
+
+print("Random date:", getRandomDate("1/1/2021", "1/1/2024"))
