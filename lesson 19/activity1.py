@@ -17,3 +17,4 @@ alist = [1, 22, 55, 66, 88, 90, 100]
 alist = alist[::-1]
 Rivarsed = alist
 print(Rivarsed) 
+print("good bye")

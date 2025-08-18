@@ -1,6 +1,30 @@
-<!-- *this is a coment-->
-<style>
-    body {
-        color: blue;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spider-Man Tic-Tac-Toe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1 class="title">🕷️ Spider-Man Tic-Tac-Toe</h1>
+
+    <div id="mode-select" class="mode">
+        <button onclick="startGame('2p')">👥 2 Player</button>
+        <button onclick="startGame('ai')">🤖 Play vs AI</button>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="actions">
+        <button id="reset" style="display:none;">🔁 Restart</button>
+        <button id="hintBtn" style="display:none;">💡 Hint</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
