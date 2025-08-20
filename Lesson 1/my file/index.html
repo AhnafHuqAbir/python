@@ -4,27 +4,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spider-Man Tic-Tac-Toe</title>
+    <title>Spider-Man Tic-Tac-Toe Smart AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --spidey-red: #e11d2e;
+            --spidey-blue: #1e6dff;
+            --bg1: #0f0c29;
+            --bg2: #302b63;
+            --bg3: #24243e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 28px;
+            min-height: 100vh;
+            font-family: "Bangers", system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+            color: #fff;
+            text-align: center;
+            position: relative;
+        }
+
+        #webCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .title {
+            font-size: clamp(28px, 6vw, 56px);
+            margin: 0 0 8px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .controls-top {
+            margin: 12px 0 6px;
+        }
+
+        .mode-btn {
+            padding: 10px 14px;
+            margin: 6px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            font-weight: 800;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .25);
+            transition: transform .12s ease, filter .12s ease;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.05);
+        }
+
+        #btn-2p {
+            background: linear-gradient(145deg, #e84b4b, #b41422);
+        }
+
+        #btn-ai {
+            background: linear-gradient(145deg, #4b8ef6, #0b3fab);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, min(22vw, 120px));
+            gap: 14px;
+            justify-content: center;
+            margin: 18px auto;
+            max-width: 420px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cell {
+            width: min(22vw, 120px);
+            height: min(22vw, 120px);
+            background: linear-gradient(180deg, #0c1220, #071021);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(36px, 8vw, 64px);
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .45), inset 0 2px 6px rgba(255, 255, 255, .02);
+            user-select: none;
+            transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+        }
+
+        .cell:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, .55);
+        }
+
+        .cell.source {
+            outline: 3px solid rgba(244, 193, 15, 0.9);
+            box-shadow: 0 12px 30px rgba(244, 193, 15, .18);
+        }
+
+        @keyframes webSling {
+            0% {
+                transform: translateY(-70%) scale(.2) rotate(-40deg);
+                opacity: 0;
+                filter: blur(2px);
+            }
+
+            55% {
+                transform: translateY(6%) scale(1.08) rotate(6deg);
+                opacity: 1;
+                filter: blur(0);
+            }
+
+            80% {
+                transform: translateY(-3%) scale(.98) rotate(-2deg);
+            }
+
+            100% {
+                transform: translateY(0) scale(1) rotate(0);
+            }
+        }
+
+        .mark {
+            display: inline-block;
+            animation: webSling .52s cubic-bezier(.2, .8, .2, 1) both;
+            text-shadow: 0 6px 20px rgba(0, 0, 0, .6);
+        }
+
+        .victory {
+            box-shadow: 0 0 40px rgba(244, 193, 15, .35) !important;
+            transform: scale(1.03);
+        }
+
+        .loss {
+            animation: loss-fancy .9s ease-in-out 0s 1 forwards;
+        }
+
+        @keyframes loss-fancy {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            15% {
+                transform: translate(-10px, 5px) rotate(-6deg);
+            }
+
+            30% {
+                transform: translate(10px, -6px) rotate(6deg);
+            }
+
+            45% {
+                transform: translate(-6px, 4px) rotate(-3deg);
+            }
+
+            60% {
+                transform: translate(6px, -4px) rotate(3deg);
+            }
+
+            100% {
+                transform: translateY(0) rotate(0deg);
+                filter: grayscale(.2);
+                opacity: .95;
+            }
+        }
+
+        .draw {
+            box-shadow: 0 0 22px rgba(255, 255, 255, .12) !important;
+        }
+
+        .controls-bottom {
+            margin-top: 14px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .small-btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: rgba(0, 0, 0, .24);
+            color: #fff;
+            font-weight: 700;
+            transition: transform .12s ease, filter .12s ease;
+        }
+
+        .small-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.06);
+        }
+
+        @media(max-width:420px) {
+            .board {
+                gap: 12px;
+            }
+
+            .cell {
+                border-radius: 10px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h1 class="title">🕷️ Spider-Man Tic-Tac-Toe</h1>
-
-    <div id="mode-select" class="mode">
-        <button onclick="startGame('2p')">👥 2 Player</button>
-        <button onclick="startGame('ai')">🤖 Play vs AI</button>
+    <h1 class="title">🕷️ Spider-Man Tic-Tac-Toe Smart AI</h1>
+    <canvas id="webCanvas"></canvas>
+    <div class="controls-top">
+        <button id="btn-2p" class="mode-btn">👥 2 Player</button>
+        <button id="btn-ai" class="mode-btn">🤖 Play vs Smart AI</button>
+    </div>
+    <div id="status" class="status">Choose a mode to start</div>
+    <div id="board" class="board"></div>
+    <div class="controls-bottom">
+        <button id="hint" class="small-btn" style="display:none;">💡 Hint</button>
+        <button id="reset" class="small-btn" style="display:none;">🔁 Restart</button>
     </div>
 
-    <div class="board" id="board"></div>
+    <script>
+        const LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+        let boardEl = document.getElementById('board'), statusEl = document.getElementById('status');
+        let btn2p = document.getElementById('btn-2p'), btnAi = document.getElementById('btn-ai');
+        let resetBtn = document.getElementById('reset'), hintBtn = document.getElementById('hint');
+        let webCanvas = document.getElementById('webCanvas'), ctx = webCanvas.getContext('2d');
+        let cells = [], mode = '', over = false, current = 'X', selectedSource = null;
+        let playerMark = '🕷️', aiMark = '🕸️';
 
-    <div class="actions">
-        <button id="reset" style="display:none;">🔁 Restart</button>
-        <button id="hintBtn" style="display:none;">💡 Hint</button>
-    </div>
+        function resizeCanvas() { webCanvas.width = window.innerWidth; webCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-    <script src="script.js"></script>
+        function shootWeb(fromCell, toCell, color = '#f4c10f') {
+            const r1 = fromCell.getBoundingClientRect(), r2 = toCell.getBoundingClientRect();
+            const startX = r1.left + r1.width / 2, startY = r1.top + r1.height / 2;
+            const endX = r2.left + r2.width / 2, endY = r2.top + r2.height / 2;
+            let progress = 0;
+            const anim = setInterval(() => {
+                progress += 0.05;
+                ctx.clearRect(0, 0, webCanvas.width, webCanvas.height);
+                ctx.beginPath(); ctx.moveTo(startX, startY);
+                const curX = startX + (endX - startX) * progress, curY = startY + (endY - startY) * progress;
+                ctx.lineTo(curX, curY); ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.shadowBlur = 12; ctx.shadowColor = color; ctx.stroke();
+                if (progress >= 1) { clearInterval(anim); ctx.clearRect(0, 0, webCanvas.width, webCanvas.height); }
+            }, 16);
+        }
+
+        btn2p.addEventListener('click', () => start('2p'));
+        btnAi.addEventListener('click', () => start('ai'));
+        resetBtn.addEventListener('click', resetGame);
+
+        function start(selectedMode) {
+            mode = selectedMode;
+            btn2p.style.display = btnAi.style.display = 'none';
+            resetBtn.style.display = hintBtn.style.display = 'inline-block';
+            if (Math.random() < 0.5) { playerMark = '🕷️'; aiMark = '🕸️'; } else { playerMark = '🕸️'; aiMark = '🕷️'; }
+            createBoard(); over = false; current = 'X'; selectedSource = null; updateStatus();
+        }
+
+        function resetGame() { btn2p.style.display = btnAi.style.display = 'inline-block'; resetBtn.style.display = hintBtn.style.display = 'none'; boardEl.innerHTML = ''; cells = []; mode = ''; over = false; current = 'X'; selectedSource = null; statusEl.textContent = 'Choose a mode to start'; }
+
+        function createBoard() { boardEl.innerHTML = ''; cells = []; for (let i = 0; i < 9; i++) { const c = document.createElement('div'); c.className = 'cell'; c.dataset.index = i; c.dataset.mark = ''; c.addEventListener('click', () => onCellClick(i)); boardEl.appendChild(c); cells.push(c); } }
+
+        function countMarks(mark) { return cells.filter(c => c.dataset.mark === mark).length; }
+        function placementPhaseActive() { return countMarks(playerMark) < 3 || (mode === 'ai' && countMarks(aiMark) < 3); }
+        function isCellEmpty(i) { return cells[i].dataset.mark == ''; }
+
+        function updateStatus(msg) { if (msg) { statusEl.textContent = msg; return; } if (!mode) { statusEl.textContent = 'Choose a mode to start'; return; } if (over) return; if (placementPhaseActive()) { statusEl.textContent = `${current === 'X' ? playerMark : (mode === 'ai' ? aiMark : '🕸️')} — place your mark`; } else { statusEl.textContent = (mode === 'ai') ? (current === 'X' ? `${playerMark} move — pick piece to move` : 'AI thinking…') : `${current === 'X' ? playerMark : aiMark} — pick piece to move`; } }
+
+        function onCellClick(i) {
+            if (over || !mode) return;
+            const cell = cells[i];
+            if (placementPhaseActive()) {
+                if (!isCellEmpty(i)) return;
+                const randomSource = cells[Math.floor(Math.random() * cells.length)];
+                shootWeb(randomSource, cell);
+                doPlace(i, current === 'X' ? playerMark : aiMark);
+                afterMoveActions(i, { type: 'place', to: i, player: current === 'X' ? playerMark : aiMark });
+                return;
+            }
+            if (selectedSource === null) {
+                if (cell.dataset.mark !== (current === 'X' ? playerMark : aiMark)) return;
+                selectedSource = i; cell.classList.add('source'); updateStatus(`${cell.dataset.mark} selected — choose empty cell to move`); return;
+            } else {
+                if (i === selectedSource) { cells[selectedSource].classList.remove('source'); selectedSource = null; updateStatus(); return; }
+                if (!isCellEmpty(i)) return;
+                shootWeb(cells[selectedSource], cell); doMove(selectedSource, i, current === 'X' ? playerMark : aiMark);
+                cells[selectedSource].classList.remove('source'); const fromIndex = selectedSource; selectedSource = null;
+                afterMoveActions(i, { type: 'move', from: fromIndex, to: i, player: current === 'X' ? playerMark : aiMark }); return;
+            }
+        }
+
+        function doPlace(i, mark) { cells[i].dataset.mark = mark; cells[i].innerHTML = `<span class="mark">${mark}</span>`; }
+        function doMove(from, to, mark) { cells[from].dataset.mark = ''; cells[from].innerHTML = ''; cells[to].dataset.mark = mark; cells[to].innerHTML = `<span class="mark">${mark}</span>`; }
+
+        function afterMoveActions(lastIndex, moveObj) {
+            if (checkWin(moveObj.player)) { endGame(moveObj.player); return; }
+            if (isDraw()) { endDraw(); return; }
+            if (mode === '2p') { current = current === 'X' ? 'O' : 'X'; updateStatus(); return; }
+            if (current === 'X') { current = 'O'; updateStatus(); setTimeout(aiAction, 300); } else { current = 'X'; updateStatus(); }
+        }
+
+        function endGame(winner) { over = true; updateStatus(`${winner} wins!`); cells.forEach(c => c.classList.add(winner === playerMark ? 'victory' : 'loss')); }
+        function endDraw() { over = true; updateStatus('Draw!'); cells.forEach(c => c.classList.add('draw')); }
+
+        function checkWin(mark) { return LINES.some(([a, b, c]) => cells[a].dataset.mark === mark && cells[b].dataset.mark === mark && cells[c].dataset.mark === mark); }
+        function isDraw() { return cells.every(c => c.dataset.mark); }
+
+        // Smart AI
+        function aiAction() {
+            if (over) return;
+            if (placementPhaseActive()) {
+                const move = smartPick(aiMark);
+                const randomSource = cells[Math.floor(Math.random() * cells.length)];
+                shootWeb(randomSource, cells[move]); doPlace(move, aiMark); afterMoveActions(move, { type: 'place', to: move, player: aiMark });
+            } else {
+                const move = smartMove(aiMark, playerMark);
+                shootWeb(cells[move.from], cells[move.to]); doMove(move.from, move.to, aiMark);
+                afterMoveActions(move.to, { type: 'move', from: move.from, to: move.to, player: aiMark });
+            }
+        }
+
+        function smartPick(mark) {
+            // Win or block
+            for (const line of LINES) {
+                const marks = line.map(i => cells[i].dataset.mark);
+                if (marks.filter(m => m === mark).length === 2 && marks.includes('')) return line[marks.indexOf('')];
+            }
+            for (const line of LINES) {
+                const marks = line.map(i => cells[i].dataset.mark);
+                if (marks.filter(m => m === playerMark).length === 2 && marks.includes('')) return line[marks.indexOf('')];
+            }
+            const empties = cells.map((c, i) => c.dataset.mark === '' ? i : null).filter(x => x !== null);
+            return empties[Math.floor(Math.random() * empties.length)];
+        }
+
+        function smartMove(ai, player) {
+            const myMarks = cells.map((c, i) => c.dataset.mark === ai ? i : null).filter(x => x !== null);
+            const empties = cells.map((c, i) => c.dataset.mark === '' ? i : null).filter(x => x !== null);
+            for (const from of myMarks) {
+                for (const to of empties) {
+                    cells[from].dataset.mark = ''; cells[to].dataset.mark = ai;
+                    if (checkWin(ai)) { cells[from].dataset.mark = ai; cells[to].dataset.mark = ''; return { from, to }; }
+                    cells[from].dataset.mark = ai; cells[to].dataset.mark = '';
+                }
+            }
+            for (const from of myMarks) {
+                for (const to of empties) {
+                    cells[from].dataset.mark = ''; cells[to].dataset.mark = player;
+                    if (checkWin(player)) { cells[from].dataset.mark = ai; cells[to].dataset.mark = ''; return { from, to }; }
+                    cells[from].dataset.mark = ai; cells[to].dataset.mark = '';
+                }
+            }
+            const from = myMarks[Math.floor(Math.random() * myMarks.length)];
+            const to = empties[Math.floor(Math.random() * empties.length)];
+            return { from, to };
+        }
+    </script>
 </body>
 
 </html>
