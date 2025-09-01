@@ -10,3 +10,4 @@ print("20 occurs", array_num.count(20), "times")
 
 array_num.reverse()
 print("reversed array:", array_num)
+
