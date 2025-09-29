@@ -16,7 +16,7 @@ class China:
         print('Mandarin is the national language of China')
 
     def type(self):
-        print("China is a highly advanced country")
+        print("China is a highly advanced in tecnology country")
 
 obj_bangladesh = Bangladesh()
 obj_Chi = China()
