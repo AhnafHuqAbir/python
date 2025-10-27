@@ -1,0 +1,17 @@
+body {
+    background-color: whitesmoke;
+    font-family: cursive;
+}
+
+.header {
+    text-align: center;
+    color: powderblue;
+    font-family: monospace;
+}
+
+.link {
+    text-decoration: none;
+    color: maroon;
+    font-family: fantasy;
+    cursor: progress;
+}

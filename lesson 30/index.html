@@ -1,0 +1,320 @@
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fantastic 4 Classic Calculator</title>
+    <style>
+        :root {
+            --bg1: #0f2540;
+            --bg2: #1b5ea8;
+            --glass: rgba(255, 255, 255, 0.06);
+            --btn: #0b3a66;
+            --btn-hover: #103f77;
+            --accent: #ffd166;
+            --text: #e6f0ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Inter, Segoe UI, Helvetica, Arial, sans-serif
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .calc-wrap {
+            width: 360px;
+            padding: 22px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+            box-shadow: 0 10px 30px rgba(3, 10, 24, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Blue 4 badge */
+        .badge {
+            position: absolute;
+            left: -30px;
+            top: -4px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: conic-gradient(from 120deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 65px;
+            transform: rotate(-20deg);
+            border: 6px solid rgba(255, 255, 255, 0.03);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px
+        }
+
+        .title {
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 600
+        }
+
+        .power {
+            font-size: 12px;
+            color: rgba(230, 240, 255, 0.6)
+        }
+
+        .display {
+            width: 100%;
+            height: 92px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: inset 0 -6px 18px rgba(3, 10, 24, 0.25);
+        }
+
+        .prev {
+            font-size: 14px;
+            color: rgba(230, 240, 255, 0.6);
+            min-height: 18px
+        }
+
+        .curr {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: right;
+            letter-spacing: 0.5px;
+            word-wrap: break-word
+        }
+
+        .pad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 14px
+        }
+
+        button.key {
+            border: 0;
+            padding: 16px;
+            border-radius: 10px;
+            background: var(--btn);
+            color: var(--text);
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(3, 10, 24, 0.45);
+            cursor: pointer;
+            transition: transform .06s, background .12s;
+            user-select: none;
+        }
+
+        button.key:active {
+            transform: translateY(2px)
+        }
+
+        button.op {
+            background: linear-gradient(180deg, var(--btn-hover), var(--btn));
+            color: var(--accent);
+            font-weight: 700
+        }
+
+        button.equal {
+            grid-column: 4/span1;
+            background: linear-gradient(180deg, #ffb56b, #ff9a2b);
+            color: #08121a;
+            font-weight: 800
+        }
+
+        button.wide {
+            grid-column: 1/span2
+        }
+
+        .small {
+            font-size: 16px;
+            padding: 12px
+        }
+
+        .footer {
+            margin-top: 12px;
+            text-align: center;
+            color: rgba(230, 240, 255, 0.45);
+            font-size: 12px
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            font-weight: 600
+        }
+
+        @media (max-width:420px) {
+            .calc-wrap {
+                width: 92%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calc-wrap" role="application" aria-label="Fantastic 4 Calculator">
+        <div class="badge">75</div>
+        <div class="header">
+            <div class="title">Bangladesh Tigers -- Sakib All Hasan</div>
+            <div class="power">Saif Hasan</div>
+        </div>
+
+        <div class="display" id="display" aria-live="polite">
+            <div class="prev" id="prev"></div>
+            <div class="curr" id="curr">0</div>
+        </div>
+
+        <div class="pad" id="pad">
+            <button class="key op small" data-action="clear">C</button>
+            <button class="key op small" data-action="neg">±</button>
+            <button class="key op small" data-action="percent">%</button>
+            <button class="key op" data-action="/">÷</button>
+
+            <button class="key" data-value="7">7</button>
+            <button class="key" data-value="8">8</button>
+            <button class="key" data-value="9">9</button>
+            <button class="key op" data-action="*">×</button>
+
+            <button class="key" data-value="4">4</button>
+            <button class="key" data-value="5">5</button>
+            <button class="key" data-value="6">6</button>
+            <button class="key op" data-action="-">−</button>
+
+            <button class="key" data-value="1">1</button>
+            <button class="key" data-value="2">2</button>
+            <button class="key" data-value="3">3</button>
+            <button class="key op" data-action="+">+</button>
+
+            <button class="key wide" data-value="0">0</button>
+            <button class="key" data-value=".">.</button>
+            <button class="key equal" data-action="=">=</button>
+        </div>
+
+        <div class="footer">Keyboard: numbers, + - * /, Enter = <kbd>Enter</kbd>, Clear <kbd>Esc</kbd></div>
+    </div>
+
+    <script>
+        // Calculator logic
+        (() => {
+            const prevEl = document.getElementById('prev');
+            const currEl = document.getElementById('curr');
+            const pad = document.getElementById('pad');
+
+            let curr = '0';
+            let prev = '';
+            let lastOp = null;
+            let overwrite = true;
+
+            const update = () => {
+                currEl.textContent = curr;
+                prevEl.textContent = prev;
+            };
+
+            function appendDigit(d) {
+                if (overwrite) {
+                    curr = d === '.' ? '0.' : d;
+                    overwrite = false;
+                } else {
+                    if (d === '.' && curr.includes('.')) return;
+                    curr = curr === '0' && d !== '.' ? d : curr + d;
+                }
+                update();
+            }
+
+            function chooseOp(op) {
+                if (!overwrite) evaluate();
+                lastOp = op;
+                prev = curr + ' ' + op;
+                overwrite = true;
+                update();
+            }
+
+            function evaluate() {
+                if (!lastOp) return;
+                // build safe expression using numbers and op
+                const a = Number(prev.split(' ')[0]);
+                const b = Number(curr);
+                let res = 0;
+                switch (lastOp) {
+                    case '+': res = a + b; break;
+                    case '-': res = a - b; break;
+                    case '*': res = a * b; break;
+                    case '/': res = b === 0 ? 'Error' : a / b; break;
+                    default: return;
+                }
+                curr = (res === 'Error') ? 'Error' : parseFloat(res.toPrecision(12)).toString();
+                prev = '';
+                lastOp = null;
+                overwrite = true;
+                update();
+            }
+
+            function clearAll() { curr = '0'; prev = ''; lastOp = null; overwrite = true; update(); }
+            function toggleNeg() { if (curr === 'Error') return; curr = (curr.startsWith('-')) ? curr.slice(1) : '-' + curr; update(); }
+            function percent() { if (curr === 'Error') return; curr = (parseFloat(curr) / 100).toString(); update(); }
+            function backspace() { if (overwrite || curr === '0') return; curr = curr.length > 1 ? curr.slice(0, -1) : '0'; update(); }
+
+            pad.addEventListener('click', e => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const v = btn.getAttribute('data-value');
+                const a = btn.getAttribute('data-action');
+
+                if (v !== null) { appendDigit(v); return; }
+                switch (a) {
+                    case 'clear': clearAll(); break;
+                    case 'neg': toggleNeg(); break;
+                    case 'percent': percent(); break;
+                    case '=': evaluate(); break;
+                    case '/': case '*': case '+': case '-': chooseOp(a); break;
+                }
+            });
+
+            // Keyboard support
+            window.addEventListener('keydown', e => {
+                if (e.key >= '0' && e.key <= '9') { appendDigit(e.key); e.preventDefault(); return; }
+                if (e.key === '.') { appendDigit('.'); e.preventDefault(); return; }
+                if (['+', '-', '*', '/'].includes(e.key)) { chooseOp(e.key); e.preventDefault(); return; }
+                if (e.key === 'Enter' || e.key === '=') { evaluate(); e.preventDefault(); return; }
+                if (e.key === 'Escape') { clearAll(); e.preventDefault(); return; }
+                if (e.key === 'Backspace') { backspace(); e.preventDefault(); return; }
+                if (e.key === '%') { percent(); e.preventDefault(); return; }
+            });
+
+            update();
+        })();
+    </script>
+</body>
+
+</html>
+
+<!--? hi there I am using what's app do you understend. I am very easy. sorry easy not busy.ok-->
+
+<!--!  hi there I am using what's app do you understend. I am very easy. sorry easy not busy.ok -->
+
+<!--* hi there I am using what's app do you understend. I am very easy. sorry easy not busy.ok -->
